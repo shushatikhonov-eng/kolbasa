@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Колбасная мастерская</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#17191B;--surface:#222629;--surface2:#2B3033;--ink:#F0ECE6;--muted:#A6A19A;--line:#41474A;
+  --red:#E8863A;--red-soft:#3A2F25;--green:#7FAE8F;--amber:#E6C34A;--bad:#F2695F;
+  color-scheme:dark;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Onest",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:16px;line-height:1.5}
+.wrap{max-width:720px;margin:0 auto;padding:20px 16px 64px}
+h1{font-size:26px;font-weight:800;margin:4px 0 2px;letter-spacing:-.01em}
+.sub{color:var(--muted);margin:0 0 18px}
+nav{display:flex;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:4px;position:sticky;top:8px;z-index:5}
+nav button{flex:1;font:inherit;font-weight:500;padding:10px 6px;border:0;background:none;color:var(--muted);border-radius:9px;cursor:pointer}
+nav button[aria-selected="true"]{background:var(--red);color:#fff}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+section{display:none;padding-top:20px}
+section.on{display:block}
+h2{font-size:19px;margin:26px 0 10px;font-weight:700}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:460px){.grid{grid-template-columns:1fr}}
+label{display:block;font-size:14px;color:var(--muted);margin-bottom:4px}
+input,select{width:100%;font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 12px;min-height:44px}
+input[type=range]{padding:0;min-height:32px;accent-color:var(--red)}
+.btn{font:inherit;font-weight:500;background:var(--red);color:#fff;border:0;border-radius:8px;padding:10px 16px;min-height:44px;cursor:pointer}
+.btn.ghost{background:none;color:var(--red);border:1px solid var(--red)}
+.btn.small{min-height:36px;padding:6px 12px;font-size:14px}
+.rule{border:0;border-top:1px solid var(--line);margin:22px 0}
+table{width:100%;border-collapse:collapse}
+td,th{padding:8px 4px;border-bottom:1px solid var(--line);text-align:left;font-weight:400;vertical-align:middle}
+th{color:var(--muted);font-size:14px}
+td.n{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
+td input{padding:6px 8px;min-height:36px;max-width:84px;text-align:right}
+.scroll{overflow-x:auto}
+.big{font-size:34px;font-weight:800;line-height:1.1;font-variant-numeric:tabular-nums}
+.stat{padding:2px 0 10px}
+.stat small{display:block;color:var(--muted);font-size:14px}
+.msg{padding:10px 12px;border-left:4px solid var(--line);background:var(--surface);margin:8px 0;border-radius:0 8px 8px 0;font-size:15px}
+.msg.ok{border-color:var(--green)}.msg.warn{border-color:var(--amber)}.msg.bad{border-color:var(--bad)}
+.bar{display:flex;height:18px;border-radius:9px;overflow:hidden;background:var(--line)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px;font-size:13px;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px}
+/* signature: the drying sausage */
+.link{position:relative;height:56px;margin:14px 0 6px}
+.link:before,.link:after{content:"";position:absolute;top:27px;height:2px;width:22px;background:var(--muted)}
+.link:before{left:0}.link:after{right:0}
+.link .casing{position:absolute;left:22px;right:22px;top:0;bottom:0;border-radius:28px;background:var(--red-soft);border:1px solid var(--line);overflow:hidden}
+.link .meat{position:absolute;left:0;top:0;bottom:0;width:100%;border-radius:28px;background:linear-gradient(90deg,#B5412F,#7A2318);transition:width .5s}
+.link .tick{position:absolute;top:-6px;bottom:-6px;width:0;border-left:2px dashed var(--ink)}
+.row{display:flex;gap:8px;align-items:end}
+.row>*{flex:1}.row>.btn{flex:0 0 auto}
+.timer{font-size:48px;font-weight:800;font-variant-numeric:tabular-nums}
+.stages li{margin:6px 0}
+svg text{fill:var(--muted);font-family:inherit;font-size:27px}
+.x{background:none;border:0;color:var(--muted);cursor:pointer;font-size:18px;min-width:36px;min-height:36px}
+.note{color:var(--muted);font-size:14px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:20px;padding:8px 14px;min-height:40px;cursor:pointer}
+.chip:hover{border-color:var(--red)}
+.chip.on{background:var(--red);color:#fff;border-color:var(--red)}
+.chip.uc{display:inline-flex;align-items:center;padding:0;overflow:hidden}
+.chip.uc button{font:inherit;font-size:14px;background:none;border:0;color:inherit;padding:8px 10px;min-height:40px;cursor:pointer}
+.chip.uc button+button{padding-left:4px;opacity:.7}
+.item{border-top:1px solid var(--line);padding:14px 0}
+.item .nm{font-weight:700;margin-bottom:6px}
+.item textarea{width:100%;font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 12px;margin-top:8px}
+
+/* ---- графитовая тема: состояния и карточки ---- */
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+.btn{color:#17191B;font-weight:600;transition:filter .15s,transform .1s}
+.btn:hover{filter:brightness(1.08)}
+.btn:active{transform:scale(.97);filter:brightness(.9)}
+.btn:disabled{opacity:.5;cursor:default}
+.btn.ghost{color:var(--red);border:1px solid var(--red);background:transparent}
+.btn.ghost:hover{background:rgba(232,134,58,.12)}
+.btn.ghost:active{transform:scale(.97);background:rgba(232,134,58,.2)}
+nav{background:var(--surface);border-color:var(--line)}
+nav button{color:var(--muted)}
+nav button:hover{color:var(--ink)}
+nav button[aria-selected="true"]{background:var(--red);color:#17191B;font-weight:700}
+.chip{background:var(--surface2);border-color:var(--line);color:var(--ink);transition:background .15s,border-color .15s,transform .1s}
+.chip:hover{border-color:var(--red)}
+.chip:active{transform:scale(.97)}
+.chip.on{background:var(--red);color:#17191B;border-color:var(--red);font-weight:600}
+input,select,textarea{background:var(--surface2);border:1px solid #545B5F;color:var(--ink)}
+input::placeholder,textarea::placeholder{color:#7D7872}
+input:focus,select:focus,textarea:focus{border-color:var(--red)}
+input[type=range]{accent-color:var(--red);min-height:36px}
+input[type=range]::-webkit-slider-thumb{width:24px;height:24px}
+input[type=range]::-moz-range-thumb{width:24px;height:24px}
+.grid label,.row label{color:var(--muted)}
+h1,h2{color:var(--ink)}
+.sub{color:var(--muted)}
+.card,.bwrap{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;margin:0 0 18px}
+.bform{background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:12px}
+.sect-t{font-weight:700;font-size:15px;margin:0 0 8px;color:var(--ink)}
+.item{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;margin:10px 0}
+.msg{background:var(--surface2);border-left-width:4px}
+.msg.ok{background:rgba(127,174,143,.08)}
+.msg.warn{background:rgba(230,195,74,.08)}
+.msg.bad{background:rgba(242,105,95,.08)}
+.bar{background:var(--line)}
+table{border-collapse:separate;border-spacing:0}
+td,th{border-bottom:1px solid var(--line)}
+th{color:var(--muted)}
+.stat small,.note{color:var(--muted)}
+.item textarea{background:var(--surface2)}
+
+/* ---- исправления вёрстки для iPhone ---- */
+.row>*{min-width:0}
+.grid>*{min-width:0}
+.grid input,.grid select,.row input,.row select{min-width:0;max-width:100%}
+input[type=date]{-webkit-appearance:none;appearance:none;min-width:0;max-width:100%;width:100%;min-height:44px;line-height:1.2;text-align:left;display:block}
+input[type=date]::-webkit-date-and-time-value{text-align:left;min-height:1.2em}
+.wrow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;align-items:end}
+.wrow>*{flex:none}
+.wrow .btn{grid-column:1/-1;width:100%}
+nav{box-shadow:0 -10px 0 0 var(--bg)}
+.legend{font-size:14px}
+nav button{min-width:0}
+@media (max-width:370px){nav button{font-size:14px;padding:10px 2px}}
+
+/* ================= Современный дизайн ================= */
+[hidden]{display:none!important}
+:root{--font:"Onest","Manrope",-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;--r:18px}
+html{-webkit-text-size-adjust:100%}
+body{font-family:var(--font);font-synthesis:none;-webkit-font-smoothing:antialiased;
+  background:radial-gradient(900px 420px at 50% -140px,rgba(232,134,58,.16),transparent 65%),var(--bg);background-repeat:no-repeat}
+button,input,select,textarea{font-family:inherit}
+svg text{font-family:var(--font)}
+.wrap{padding-bottom:120px}
+.ic{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+header.top{display:flex;align-items:center;gap:14px;margin:6px 0 18px}
+header.top .logo{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;color:#17191B;flex:none;
+  background:linear-gradient(145deg,#F2A04A,#D2702A);box-shadow:0 8px 20px rgba(232,134,58,.28)}
+header.top .logo .ic{width:30px;height:30px;stroke-width:1.9}
+header.top h1{font-size:24px;line-height:1.15;margin:0;letter-spacing:-.02em}
+header.top .sub{margin:4px 0 0;font-size:14px}
+
+/* нижняя панель вкладок */
+nav{position:fixed;left:50%;right:auto;transform:translateX(-50%);bottom:0;top:auto;width:100%;max-width:720px;margin:0;z-index:30;
+  border:0;border-top:1px solid var(--line);border-radius:22px 22px 0 0;box-shadow:0 -10px 28px rgba(0,0,0,.4);
+  background:rgba(30,34,36,.92);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);
+  padding:8px 10px calc(8px + env(safe-area-inset-bottom,0px));gap:6px}
+nav button{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 2px 7px;font-size:12px;font-weight:600;
+  border-radius:14px;color:var(--muted);background:none;letter-spacing:.01em}
+nav button .ic{width:24px;height:24px}
+nav button:active{transform:scale(.96)}
+nav button[aria-selected="true"]{background:rgba(232,134,58,.16);color:#F2A25C;font-weight:700}
+nav button[aria-selected="true"] .ic{stroke-width:2.1}
+@media (max-width:370px){nav button{font-size:11px;padding:8px 0 7px}}
+
+/* карточки */
+section{padding-top:0}
+.card,.bwrap{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;margin:0 0 14px;
+  box-shadow:0 1px 0 rgba(255,255,255,.04) inset,0 12px 28px rgba(0,0,0,.22)}
+.card>h2{display:flex;align-items:center;gap:10px;font-size:18px;font-weight:700;letter-spacing:-.01em;margin:0 0 14px}
+.card>h2::before{content:"";width:4px;height:18px;border-radius:2px;background:var(--red);flex:none}
+.card>h2 span{flex:1}
+.sect-t{font-size:16px}
+.stat{background:var(--surface2);border:1px solid var(--line);border-radius:14px;padding:14px;margin:0}
+.stat .big{color:#F2B27A;font-size:30px;letter-spacing:-.02em}
+.grid{gap:14px}
+
+/* кнопки, чипы, поля */
+.btn,.chip{display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn{border-radius:14px;min-height:46px;padding:10px 18px;font-weight:700;background:linear-gradient(180deg,#F0963F,#D9722A);box-shadow:0 6px 16px rgba(232,134,58,.25)}
+.btn.small{min-height:40px;padding:8px 14px;border-radius:12px}
+.btn.ghost{background:transparent;box-shadow:none;border:1.5px solid rgba(232,134,58,.7);color:#F2A25C}
+.btn .ic,.chip .ic{width:18px;height:18px}
+.chip{border-radius:999px;padding:9px 15px;min-height:42px;font-weight:500}
+.chip.on{background:linear-gradient(180deg,#F0963F,#D9722A);box-shadow:0 4px 12px rgba(232,134,58,.25)}
+.chip.uc{padding:0}
+input,select,textarea{border-radius:14px;min-height:48px;background:var(--surface2);border:1.5px solid #4C5357;padding:11px 14px}
+textarea{min-height:0}
+input:focus,select:focus,textarea:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(232,134,58,.22);outline:none}
+select{-webkit-appearance:none;appearance:none;padding-right:40px;background-repeat:no-repeat;background-position:right 14px center;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23A6A19A' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")}
+label{font-size:14px;font-weight:500;margin-bottom:6px}
+input[type=range]{-webkit-appearance:none;appearance:none;background:transparent;min-height:32px;padding:0;border:0;box-shadow:none;accent-color:var(--red)}
+input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:3px;background:linear-gradient(90deg,rgba(232,134,58,.55),var(--line))}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:28px;height:28px;margin-top:-11px;border-radius:50%;background:#F0963F;border:4px solid var(--surface);box-shadow:0 0 0 1.5px #F0963F,0 4px 10px rgba(0,0,0,.4)}
+input[type=range]::-moz-range-track{height:6px;border-radius:3px;background:var(--line)}
+input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#F0963F;border:4px solid var(--surface)}
+.x{display:inline-grid;place-items:center;border-radius:10px;color:var(--muted);min-width:40px;min-height:40px}
+.x .ic{width:18px;height:18px}
+.x:hover{color:var(--bad);background:rgba(242,105,95,.1)}
+.x:active{background:rgba(242,105,95,.2)}
+
+/* сообщения */
+.msg{display:flex;gap:10px;align-items:flex-start;border-radius:12px;border:1px solid var(--line);border-left-width:4px;padding:12px 14px;font-size:15px;line-height:1.45}
+.msg .ic{margin-top:2px;width:20px;height:20px}
+.msg.ok{border-left-color:var(--green)}.msg.ok .ic{color:var(--green)}
+.msg.warn{border-left-color:var(--amber)}.msg.warn .ic{color:var(--amber)}
+.msg.bad{border-left-color:var(--bad)}.msg.bad .ic{color:var(--bad)}
+.msg:not(.ok):not(.warn):not(.bad) .ic{color:var(--muted)}
+
+/* таблицы и прочее */
+table td,table th{padding:10px 6px}
+.timer{font-size:52px;letter-spacing:-.02em;color:#F2B27A}
+.item{border-radius:16px;background:var(--surface2)}
+.legend i{width:12px;height:12px}
+.link .meat{background:linear-gradient(90deg,#C4492F,#7A2318)}
+
+/* ---- плитки рецептов с иллюстрациями ---- */
+.pgroup+.pgroup{margin-top:18px}
+.pgroup h3{display:flex;align-items:center;gap:8px;margin:0 0 10px;font-size:13px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.pgroup h3::after{content:"";flex:1;height:1px;background:var(--line)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(98px,1fr));gap:10px}
+.tile{display:flex;flex-direction:column;align-items:stretch;gap:8px;padding:7px 7px 10px;border-radius:16px;background:var(--surface2);
+  border:1.5px solid var(--line);color:var(--ink);font:inherit;text-align:center;cursor:pointer;transition:border-color .15s,background .15s,transform .1s;min-width:0}
+.tile:hover{border-color:rgba(232,134,58,.6)}
+.tile:active{transform:scale(.97)}
+.tile.on{border-color:var(--red);background:rgba(232,134,58,.12);box-shadow:0 0 0 3px rgba(232,134,58,.14)}
+.tile .art{width:100%;height:auto;display:block;border-radius:11px;background:radial-gradient(120% 120% at 30% 15%,#323a3e,#1f2427)}
+.tile span{font-size:13px;font-weight:600;line-height:1.25;min-height:2.5em;display:flex;align-items:center;justify-content:center;padding:0 2px}
+.tile.on span{color:#F2A25C}
+.ihead{display:flex;gap:12px;align-items:center;margin-bottom:6px}
+.ihead .nm{margin:0;flex:1;min-width:0}
+.thumb{width:76px;flex:none}
+.thumb .art{width:100%;height:auto;display:block;border-radius:11px;background:radial-gradient(120% 120% at 30% 15%,#323a3e,#1f2427)}
+
+/* ---- «Мои рецепты» плитками ---- */
+.uh{display:flex;align-items:center;gap:8px;margin:18px 0 10px;font-size:13px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.uh::after{content:"";flex:1;height:1px;background:var(--line)}
+.tile.uc{position:relative;padding:0}
+.uuse{display:flex;flex-direction:column;align-items:stretch;gap:8px;width:100%;min-width:0;padding:7px 7px 10px;background:none;border:0;border-radius:16px;color:inherit;font:inherit;text-align:center;cursor:pointer}
+.uuse .art{width:100%;height:auto;display:block;border-radius:11px;background:radial-gradient(120% 120% at 30% 15%,#323a3e,#1f2427)}
+.uuse span{font-size:13px;font-weight:600;line-height:1.25;min-height:2.5em;display:flex;align-items:center;justify-content:center;padding:0 2px;overflow-wrap:anywhere}
+.urm{position:absolute;top:11px;right:11px;width:30px;height:30px;min-width:30px;min-height:30px;border-radius:50%;display:grid;place-items:center;border:0;background:rgba(23,25,27,.78);color:#F0ECE6}
+.urm .ic{width:14px;height:14px}
+.urm:hover{background:rgba(242,105,95,.9);color:#17191B}
+</style>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+<symbol id="i-logo" viewBox="0 0 24 24"><path d="M2 12h3M19 12h3"/><rect x="5" y="7" width="14" height="10" rx="5"/><path d="M10 10v4M14 10v4"/></symbol>
+<symbol id="i-flask" viewBox="0 0 24 24"><path d="M9 3h6M10 3v6L4.6 18.2A2 2 0 0 0 6.3 21h11.4a2 2 0 0 0 1.7-2.8L14 9V3"/><path d="M7.5 15h9"/></symbol>
+<symbol id="i-flame" viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.4-.5-2-1-3-1.1-2.1-.2-4.1 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.2.4-2.3 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></symbol>
+<symbol id="i-wind" viewBox="0 0 24 24"><path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"/><path d="M9.6 4.6A2 2 0 1 1 11 8H2"/><path d="M12.6 19.4A2 2 0 1 0 14 16H2"/></symbol>
+<symbol id="i-book" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></symbol>
+<symbol id="i-star" viewBox="0 0 24 24"><path d="M12 2.8l2.8 5.9 6.4.9-4.7 4.5 1.2 6.4L12 17.4 6.3 20.5l1.2-6.4L2.8 9.6l6.4-.9z"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5"/><path d="M8 12.5l2.8 2.8L16 9.5"/></symbol>
+<symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9.5v4M12 17h.01"/></symbol>
+<symbol id="i-xc" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5"/><path d="M15 9l-6 6M9 9l6 6"/></symbol>
+<symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5"/><path d="M12 16.5v-5M12 8h.01"/></symbol>
+</defs></svg>
+<div class="wrap">
+<header class="top"><div class="logo"><svg class="ic"><use href="#i-logo"/></svg></div><div><h1>Колбасная мастерская</h1><p class="sub">Рецептура, варка и вяление — по весу и по факту.</p></div></header>
+<nav role="tablist">
+  <button role="tab" aria-selected="true" data-t="r"><svg class="ic"><use href="#i-flask"/></svg><span>Рецептура</span></button>
+  <button role="tab" aria-selected="false" data-t="c"><svg class="ic"><use href="#i-flame"/></svg><span>Варка</span></button>
+  <button role="tab" aria-selected="false" data-t="d"><svg class="ic"><use href="#i-wind"/></svg><span>Вяление</span></button>
+  <button role="tab" aria-selected="false" data-t="b"><svg class="ic"><use href="#i-book"/></svg><span>Книга</span></button>
+</nav>
+
+<!-- РЕЦЕПТУРА -->
+<section id="r" class="on">
+  <h2 style="margin-top:0">Готовые рецепты</h2><div class="chips" id="r-pre"></div><p class="note" id="r-pn">Выберите рецепт: подставятся вид, соль и набор специй. Дальше всё можно менять.</p>
+  <h2>Параметры рецепта</h2>
+  <div class="grid">
+    <div><label for="r-type">Вид колбасы</label>
+      <select id="r-type">
+        <option value="boiled">Варёная (докторская, сосиски)</option>
+        <option value="semi">Варёно-копчёная / полукопчёная</option>
+        <option value="dry" selected>Сыровяленая / сырокопчёная</option>
+        <option value="whole">Цельномышечная вяленая (балык)</option>
+      </select></div>
+    <div><label for="r-mass">Масса фарша (мясо + шпик), г</label><input id="r-mass" type="number" inputmode="decimal" value="1000" min="1"></div>
+    <div><label for="r-st">Соль</label>
+      <select id="r-st"><option value="cure">Нитритная (0,6 % NaNO₂)</option><option value="mix">Смесь нитритной и обычной</option><option value="plain">Обычная поваренная</option></select></div>
+    <div><label for="r-salt">Соль, % от массы: <b id="r-saltv"></b></label><input id="r-salt" type="range" min="1" max="5" step="0.1"></div>
+    <div id="mixbox" hidden><label for="r-share">Доля в смеси: <b id="r-sharev"></b></label><input id="r-share" type="range" min="0" max="100" step="5"></div>
+  </div>
+
+  <h2>Соль</h2>
+  <div class="grid">
+    <div class="stat"><span class="big" id="o-salt"></span><small id="o-salt-l">соли на партию, г</small></div>
+    <div class="stat"><span class="big" id="o-final"></span><small>соли в готовом продукте, %</small></div>
+  </div>
+  <div id="salt-msgs"></div>
+
+  <h2>Специи, г на 1 кг</h2>
+  <div class="scroll"><table id="spices"><thead><tr><th>Специя</th><th style="text-align:right">г/кг</th><th style="text-align:right">На партию, г</th><th></th></tr></thead><tbody></tbody></table></div>
+  <div id="removed" style="margin-top:12px"></div>
+  <div class="row" style="margin-top:12px">
+    <div><label for="sp-name">Своя специя</label><input id="sp-name" placeholder="Название"></div>
+    <button class="btn ghost" id="sp-add">Добавить</button>
+  </div>
+
+  <h2>Баланс вкуса</h2>
+  <div class="bar" id="bal"></div>
+  <div class="legend" id="bal-l"></div>
+  <p class="stat"><span class="big" id="o-sp"></span><small>специй (без сахара), г/кг</small></p>
+  <div id="sp-msgs"></div>
+</section>
+
+<!-- ВАРКА -->
+<section id="c">
+  <h2 style="margin-top:0">Готовые режимы</h2><div class="chips" id="c-pre"></div><p class="note" id="c-pn">Выберите изделие: подставятся диаметр, способ и цель в центре.</p>
+  <h2>Параметры варки</h2>
+  <div class="grid">
+    <div><label for="c-d">Диаметр колбасы, мм</label><input id="c-d" type="number" inputmode="decimal" value="45" min="15" max="150"></div>
+    <div><label for="c-m">Способ</label>
+      <select id="c-m"><option value="1">Варка в воде</option><option value="1.1">Паровая камера</option><option value="1.25">Духовка с водяной баней</option></select></div>
+    <div><label for="c-t0">Температура фарша на старте, °C</label><input id="c-t0" type="number" inputmode="decimal" value="8"></div>
+    <div><label for="c-tc">Цель в центре, °C</label><input id="c-tc" type="number" inputmode="decimal" value="72" min="68" max="80"></div>
+  </div>
+  <h2>Расчёт</h2>
+  <div class="grid">
+    <div class="stat"><span class="big" id="c-time"></span><small>ориентировочное время варки</small></div>
+    <div class="stat"><span class="big" id="c-bath"></span><small>температура воды или камеры, °C</small></div>
+  </div>
+  <ul class="stages" id="c-stages"></ul>
+  <p class="note">Это оценка. Решает щуп: колбаса готова, когда в центре достигнута цель. Время считается от момента, когда вода вернулась к рабочей температуре.</p>
+  <h2>Таймер</h2>
+  <div class="timer" id="tm">00:00</div>
+  <div class="row" style="margin-top:8px">
+    <button class="btn" id="tm-go">Запустить таймер</button>
+    <button class="btn ghost" id="tm-stop">Сброс</button>
+  </div>
+</section>
+
+<!-- ВЯЛЕНИЕ -->
+<section id="d">
+  <div class="bwrap" style="padding-bottom:12px">
+    <div class="sect-t">Партии</div>
+    <div class="chips" id="d-batches"></div>
+  </div>
+  <div class="bwrap">
+    <div class="sect-t">Батоны партии <span class="note" style="font-weight:400">— каждый учитывается отдельно</span></div>
+    <div class="chips" id="d-bat"></div>
+    <div class="row" style="margin-top:12px;flex-wrap:wrap">
+      <button class="btn small" id="d-bnew"><svg class="ic"><use href="#i-plus"/></svg> Добавить батон</button>
+      <button class="btn ghost small" id="d-bdel" hidden>Удалить батон</button>
+    </div>
+    <div id="d-bform" class="bform" hidden>
+      <div class="grid">
+        <div><label for="bf-name">Название батона</label><input id="bf-name" placeholder="Батон 2"></div>
+        <div><label for="bf-start">Дата закладки</label><input id="bf-start" type="date"></div>
+        <div><label for="bf-w0">Начальный вес, г</label><input id="bf-w0" type="number" inputmode="decimal" placeholder="1000"></div>
+        <div><label for="bf-goal">Целевая потеря веса, %</label><input id="bf-goal" type="number" inputmode="decimal" value="35"></div>
+      </div>
+      <div class="row" style="margin-top:12px"><button class="btn" id="bf-ok">Создать батон</button><button class="btn ghost" id="bf-cancel">Отмена</button></div>
+    </div>
+  </div>
+  <h2 style="margin-top:0">Готовые режимы вяления</h2><div class="chips" id="d-pre"></div><p class="note" id="d-pn">Выберите изделие: подставится целевая потеря веса и типовые сроки.</p>
+  <h2>Данные батона</h2>
+  <div class="grid">
+    <div><label for="d-name">Партия</label><input id="d-name" placeholder="Например, салями №1"></div>
+    <div><label for="d-bname">Название батона</label><input id="d-bname" placeholder="Батон 1"></div>
+    <div><label for="d-start">Дата закладки батона</label><input id="d-start" type="date"></div>
+    <div><label for="d-w0">Начальный вес батона, г</label><input id="d-w0" type="number" inputmode="decimal" placeholder="1000"></div>
+    <div><label for="d-goal">Целевая потеря веса, %</label><input id="d-goal" type="number" inputmode="decimal" value="35" min="5" max="60"></div>
+  </div>
+  <p class="note">Ориентиры потери: полусухая 20–25 %, сырокопчёная 30–35 %, сыровяленая 35–40 %, цельномышечная 30–35 %. Условия: 12–15 °C, влажность 75–80 %.</p>
+
+  <div class="link" aria-hidden="true"><div class="casing"><div class="meat" id="d-fill"></div></div><div class="tick" id="d-tick"></div></div>
+  <div class="grid">
+    <div class="stat"><span class="big" id="d-loss">—</span><small>потеря веса, %</small></div>
+    <div class="stat"><span class="big" id="d-target">—</span><small>вес готовности, г</small></div>
+  </div>
+  <div id="d-msgs"></div>
+
+  <h2>Взвешивание</h2>
+  <div class="row wrow">
+    <div><label for="w-date">Дата</label><input id="w-date" type="date"></div>
+    <div><label for="w-val">Вес, г</label><input id="w-val" type="number" inputmode="decimal"></div>
+    <button class="btn" id="w-add">Записать</button>
+  </div>
+  <p class="note" id="w-hint" aria-live="polite" style="margin:6px 0 0"></p>
+  <div class="scroll"><table id="w-tab" style="margin-top:8px"><thead><tr><th>Дата</th><th style="text-align:right">Вес, г</th><th style="text-align:right">Потеря, %</th><th style="text-align:right">В сутки, %</th><th></th></tr></thead><tbody></tbody></table></div>
+  <div class="scroll"><svg id="chart" viewBox="0 0 600 300" width="100%" role="img" aria-label="График потери веса"></svg></div>
+  <button class="btn ghost small" id="d-reset">Удалить эту партию</button>
+</section>
+
+<!-- КНИГА -->
+<section id="b">
+  <div class="row" style="flex-wrap:wrap">
+    <div style="min-width:200px"><label for="b-name">Сохранить текущие настройки как</label><input id="b-name" placeholder="Название рецепта"></div>
+    <button class="btn" id="b-save"><svg class="ic"><use href="#i-star"/></svg> В избранное</button>
+    <button class="btn ghost" id="b-add"><svg class="ic"><use href="#i-plus"/></svg> В готовые рецепты</button>
+  </div>
+  <p class="note" id="b-msg" aria-live="polite">Сохраняется всё сразу: рецептура, варка и вяление.</p>
+  <h2>Избранное</h2>
+  <p class="note">Рецепты, которые понравились. Приготовили и результат устроил — перенесите в книгу.</p>
+  <div id="b-fav"></div>
+  <h2>Книга проверенных рецептов</h2>
+  <div id="b-book"></div>
+</section>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+/* ---------- Telegram Mini App: хранилище и тема ---------- */
+const tg=window.Telegram&&window.Telegram.WebApp;
+const inTg=!!(tg&&tg.initData);
+const cloud=inTg&&tg.CloudStorage?tg.CloudStorage:null;
+const KEYS=["kolb.r","kolb.dry2","kolb.d","kolb.book","kolb.ui"];
+const ck=k=>k.replace(/\./g,"_");
+const mem={},counts={},timers={};
+function cloudLoad(done){
+  if(!cloud){done();return}
+  let fin=false;const end=()=>{if(!fin){fin=true;done()}};
+  setTimeout(end,4000);
+  try{
+    cloud.getItems(KEYS.map(k=>ck(k)+"_n"),(err,res)=>{
+      if(err||!res){end();return}
+      const need=[];
+      KEYS.forEach(k=>{const n=parseInt(res[ck(k)+"_n"]||"0",10)||0;counts[k]=n;for(let i=0;i<n;i++)need.push(ck(k)+"_"+i)});
+      if(!need.length){end();return}
+      cloud.getItems(need,(e2,r2)=>{
+        if(!e2&&r2)KEYS.forEach(k=>{const n=counts[k];if(!n)return;let t="";for(let i=0;i<n;i++)t+=r2[ck(k)+"_"+i]||"";mem[k]=t});
+        end();
+      });
+    });
+  }catch(e){end()}
+}
+function cloudSave(k,str){
+  if(!cloud)return;
+  clearTimeout(timers[k]);
+  timers[k]=setTimeout(()=>{
+    try{
+      const ch=str.match(/[\s\S]{1,3000}/g)||[""];
+      ch.forEach((c,i)=>cloud.setItem(ck(k)+"_"+i,c));
+      cloud.setItem(ck(k)+"_n",String(ch.length));
+      const old=counts[k]||0;
+      if(old>ch.length){const rm=[];for(let i=ch.length;i<old;i++)rm.push(ck(k)+"_"+i);cloud.removeItems(rm)}
+      counts[k]=ch.length;
+    }catch(e){}
+  },700);
+}
+const store={
+  get(k,d){
+    try{const v=(k in mem)?mem[k]:localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}
+  },
+  set(k,v){
+    let str;try{str=JSON.stringify(v)}catch(e){return}
+    mem[k]=str;
+    try{localStorage.setItem(k,str)}catch(e){}
+    cloudSave(k,str);
+  }
+};
+function applyTg(){
+  if(!inTg)return;
+  document.documentElement.setAttribute("data-theme",tg.colorScheme==="dark"?"dark":"light");
+  try{
+    const bg=getComputedStyle(document.documentElement).getPropertyValue("--bg").trim();
+    tg.setHeaderColor(bg);tg.setBackgroundColor(bg);
+  }catch(e){}
+}
+if(inTg){
+  try{tg.expand()}catch(e){}
+  try{tg.disableVerticalSwipes()}catch(e){}
+  try{tg.onEvent("themeChanged",applyTg)}catch(e){}
+  applyTg();
+}
+function boot(){
+const fmt=(n,d=0)=>isFinite(n)?n.toLocaleString("ru-RU",{maximumFractionDigits:d,minimumFractionDigits:d}):"—";
+const IC=n=>`<svg class="ic"><use href="#i-${n}"/></svg>`;
+const MI={ok:"check",warn:"alert",bad:"xc","":"info"};
+const msg=(cls,t)=>`<div class="msg ${cls}">${IC(MI[cls]||"info")}<span>${t}</span></div>`;
+
+/* Вкладки */
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("nav button").forEach(x=>x.setAttribute("aria-selected",x===b));
+  document.querySelectorAll("section").forEach(s=>s.classList.toggle("on",s.id===b.dataset.t));
+});
+
+/* ---------- Рецептура ---------- */
+const TYPES={
+  boiled:{salt:[1.6,2.2],def:2.0,loss:0,sugar:1},
+  semi:{salt:[2.0,2.8],def:2.4,loss:15,sugar:1.5},
+  dry:{salt:[2.5,3.5],def:2.8,loss:35,sugar:2.5},
+  whole:{salt:[3.0,4.5],def:3.5,loss:32,sugar:2}
+};
+const DEF_SP=[["Перец чёрный молотый",2],["Чеснок свежий",3],["Паприка сладкая",3],["Кориандр",1.5],["Мускатный орех",0.5],["Кардамон",0.3],["Сахар / декстроза",2.5]];
+let R=store.get("kolb.r",{type:"dry",mass:1000,st:"cure",salt:2.8,share:50,sp:DEF_SP});
+if(R.share==null)R.share=50;
+if(!R.removed)R.removed=[];
+const SPC=['#D9803F','#C9A94E','#8DAE72','#5FA6A0','#6F8FC9','#A58BC6','#C4604E','#9AA3A8'];
+const hue=i=>SPC[((i%SPC.length)+SPC.length)%SPC.length];
+
+function renderSpices(){
+  const tb=$("spices").tBodies[0];tb.innerHTML="";
+  R.sp.forEach((s,i)=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td>${esc(s[0])}</td><td style="text-align:right"><input type="number" step="0.1" min="0" value="${s[1]}" aria-label="${esc(s[0])}, г/кг"></td><td class="n"></td><td><button class="x" aria-label="Удалить ${esc(s[0])}">${IC("x")}</button></td>`;
+    tr.querySelector("input").oninput=e=>{s[1]=Math.max(0,parseFloat(e.target.value)||0);calcR()};
+    tr.querySelector("button").onclick=()=>{R.removed.push(R.sp.splice(i,1)[0]);renderSpices();calcR()};
+    tb.appendChild(tr);
+  });
+  renderRemoved();
+}
+function renderRemoved(){
+  const box=$("removed");
+  const miss=DEF_SP.filter(d=>!R.sp.some(s=>s[0]===d[0]));
+  let h="";
+  if(R.removed.length)h+=`<div class="note" style="margin-bottom:6px">Удалённые — нажмите, чтобы вернуть:</div><div class="chips">`+R.removed.map((s,i)=>`<button class="chip" data-i="${i}">+ ${esc(s[0])}</button>`).join("")+`</div>`;
+  if(miss.length)h+=`<div style="margin-top:10px"><button class="btn ghost small" id="sp-def">Вернуть стандартный набор</button></div>`;
+  box.innerHTML=h;
+  box.querySelectorAll(".chip").forEach(b=>b.onclick=()=>{R.sp.push(R.removed.splice(+b.dataset.i,1)[0]);renderSpices();calcR()});
+  const bd=$("sp-def");
+  if(bd)bd.onclick=()=>{miss.forEach(d=>R.sp.push([d[0],d[1]]));R.removed=R.removed.filter(x=>!miss.some(d=>d[0]===x[0]));renderSpices();calcR()};
+}
+function calcR(){
+  const T=TYPES[R.type],mass=Math.max(0,R.mass),kg=mass/1000;
+  $("r-type").value=R.type;$("r-st").value=R.st;$("mixbox").hidden=R.st!=="mix";$("r-share").value=R.share;$("r-sharev").textContent=R.share+" % нитритной соли";$("r-mass").value=R.mass;$("r-salt").value=R.salt;$("r-saltv").textContent=fmt(R.salt,1)+" %";
+  const sAll=mass*R.salt/100;$("o-salt").textContent=fmt(sAll,1);
+  $("o-salt-l").textContent=R.st==="mix"?`соли на партию, г: нитритной ${fmt(sAll*R.share/100,1)} + обычной ${fmt(sAll*(100-R.share)/100,1)}`:"соли на партию, г";
+  const fin=R.salt/(1-T.loss/100);
+  $("o-final").textContent=fmt(fin,1);
+  let m="";
+  const [lo,hi]=T.salt;
+  if(R.salt<lo)m+=msg("warn",`Соли мало для этого вида: обычно ${fmt(lo,1)}–${fmt(hi,1)} %. Риск плохой стабильности и вкуса.`);
+  else if(R.salt>hi)m+=msg("warn",`Соли много: обычно ${fmt(lo,1)}–${fmt(hi,1)} %. После вяления будет ещё солонее.`);
+  else m+=msg("ok",`Соль в норме для этого вида (${fmt(lo,1)}–${fmt(hi,1)} %).`);
+  const f=R.st==="cure"?1:R.st==="mix"?R.share/100:0;
+  if(f>0){
+    const ppm=R.salt*60*f;
+    m+=msg(ppm>150?"bad":"ok",`Нитрит на входе ≈ ${fmt(ppm)} мг/кг${ppm>150?" — выше допустимых 150. Снизьте долю нитритной соли или общую дозу.":"."}`);
+  } else if(R.type!=="boiled") m+=msg("warn","Без нитрита сыровяленые изделия — зона риска ботулизма. Лучше нитритная соль или проверенная схема засола.");
+  if(T.loss&&fin>6.5)m+=msg("warn",`После потери ${T.loss} % веса соли в продукте будет около ${fmt(fin,1)} % — это пересол на вкус.`);
+  $("salt-msgs").innerHTML=m;
+  document.querySelectorAll("#spices tbody tr").forEach((tr,i)=>tr.querySelector(".n").textContent=fmt(R.sp[i][1]*kg,1));
+  const sp=R.sp.filter(s=>!/сахар|декстроз|лактоз/i.test(s[0])),tot=sp.reduce((a,s)=>a+s[1],0);
+  $("o-sp").textContent=fmt(tot,1);
+  $("bal").innerHTML=sp.filter(s=>s[1]>0).map(s=>`<div title="${esc(s[0])}" style="width:${s[1]/tot*100}%;background:${hue(R.sp.indexOf(s))}"></div>`).join("");
+  $("bal-l").innerHTML=sp.filter(s=>s[1]>0).map(s=>`<span><i style="background:${hue(R.sp.indexOf(s))}"></i>${esc(s[0])} ${fmt(s[1]/tot*100)}%</span>`).join("");
+  let h="";const g=n=>{const s=R.sp.find(x=>x[0].toLowerCase().includes(n));return s?s[1]:0};
+  if(tot>10)h+=msg("warn","Специй больше 10 г/кг — вкус мяса уйдёт на второй план.");
+  if(g("перец")>4)h+=msg("warn","Перца больше 4 г/кг — будет жечь.");
+  if(g("мускат")>1)h+=msg("warn","Мускатного ореха больше 1 г/кг — появится горечь.");
+  if(g("чеснок")>6)h+=msg("warn","Чеснока больше 6 г/кг — забьёт остальные специи.");
+  if(g("паприка")>15)h+=msg("warn","Паприки больше 15 г/кг — вкус станет травяным.");
+  const sg=R.sp.filter(s=>/сахар|декстроз/i.test(s[0])).reduce((a,s)=>a+s[1],0);
+  if(R.type==="dry"&&sg<1)h+=msg("warn","Для сыровяленой нужен сахар или декстроза (1–3 г/кг): это пища для культур и цвет.");
+  $("sp-msgs").innerHTML=h||msg("ok","Баланс специй без перекосов.");
+  store.set("kolb.r",R);
+}
+$("r-type").onchange=e=>{R.type=e.target.value;R.salt=TYPES[R.type].def;const s=R.sp.find(x=>/сахар|декстроз/i.test(x[0]));if(s)s[1]=TYPES[R.type].sugar;renderSpices();calcR()};
+$("r-mass").oninput=e=>{R.mass=parseFloat(e.target.value)||0;calcR()};
+$("r-st").onchange=e=>{R.st=e.target.value;calcR()};
+$("r-salt").oninput=e=>{R.salt=parseFloat(e.target.value);calcR()};
+$("r-share").oninput=e=>{R.share=parseFloat(e.target.value);calcR()};
+$("sp-add").onclick=()=>{const n=$("sp-name").value.trim();if(!n)return;R.sp.push([n,1]);$("sp-name").value="";renderSpices();calcR()};
+renderSpices();calcR();
+
+/* ---------- Варка ---------- */
+function calcC(){
+  const d=parseFloat($("c-d").value)||0,m=parseFloat($("c-m").value),t0=parseFloat($("c-t0").value)||0,tc=parseFloat($("c-tc").value)||72;
+  const t=Math.round((0.0125*d*d+15)*m*(1+(20-t0)*0.012)/5)*5;
+  const bath=tc+6;
+  $("c-time").textContent=t>=60?`${Math.floor(t/60)} ч ${t%60} мин`:`${t} мин`;
+  $("c-bath").textContent=fmt(bath);
+  const cool=Math.max(10,Math.round(t*0.25/5)*5);
+  $("c-stages").innerHTML=`<li>Нагрев воды до ${fmt(bath)} °C, закладка колбасы.</li><li>Варка ${t} мин при ${fmt(bath-2)}–${fmt(bath)} °C, не доводя до кипения.</li><li>Проверка щупом: ${fmt(tc)} °C в центре.</li><li>Холодный душ или ледяная вода около ${cool} мин, до 30 °C в центре.</li><li>Подсушка 30–60 мин на воздухе, затем холод.</li>`;
+  return t;
+}
+["c-d","c-m","c-t0","c-tc"].forEach(i=>$(i).oninput=calcC);calcC();
+let tmEnd=0,tmInt=null;
+function beep(){try{const a=new (window.AudioContext||window.webkitAudioContext)();[0,.3,.6].forEach(o=>{const s=a.createOscillator();s.frequency.value=880;s.connect(a.destination);s.start(a.currentTime+o);s.stop(a.currentTime+o+.2)})}catch(e){}}
+function tick(){const r=Math.max(0,Math.round((tmEnd-Date.now())/1000));$("tm").textContent=`${String(Math.floor(r/60)).padStart(2,"0")}:${String(r%60).padStart(2,"0")}`;if(r===0){clearInterval(tmInt);tmInt=null;$("tm-go").textContent="Запустить таймер";beep()}}
+$("tm-go").onclick=()=>{if(tmInt)return;tmEnd=Date.now()+calcC()*60000;tmInt=setInterval(tick,500);tick();$("tm-go").textContent="Идёт варка…"};
+$("tm-stop").onclick=()=>{clearInterval(tmInt);tmInt=null;$("tm").textContent="00:00";$("tm-go").textContent="Запустить таймер"};
+
+/* ---------- Вяление ---------- */
+const today=()=>{const n=new Date();return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,"0")}-${String(n.getDate()).padStart(2,"0")}`};
+let uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+function newBaton(o={}){return {id:uid(),name:o.name||"Батон 1",start:o.start||today(),w0:o.w0??"",goal:o.goal??35,log:o.log||[]}}
+function newPartition(name){return {id:uid(),name:name||"",batons:[newBaton()],activeBaton:0}}
+function migratePartition(p){
+  if(Array.isArray(p.batons))return p;
+  return {id:uid(),name:p.name||"",batons:[newBaton({name:"Батон 1",start:p.start,w0:p.w0,goal:p.goal,log:Array.isArray(p.log)?p.log:[]})],activeBaton:0};
+}
+const rawDB=store.get("kolb.dry2",null);
+const legacyD=store.get("kolb.d",null);
+let DB=rawDB||(legacyD?{list:[legacyD],active:0}:null);
+if(DB&&Array.isArray(DB.list)&&DB.list.some(p=>!Array.isArray(p.batons))){
+  try{if(!localStorage.getItem("kolb.dry2.bak"))localStorage.setItem("kolb.dry2.bak",JSON.stringify(DB))}catch(e){}
+}
+if(DB&&Array.isArray(DB.list)&&DB.list.length)DB={list:DB.list.map(migratePartition),active:DB.active||0};
+else DB={list:[newPartition("")],active:0};
+DB.list.forEach(p=>{if(!p.batons.length)p.batons=[newBaton()];if(p.activeBaton==null||p.activeBaton>=p.batons.length)p.activeBaton=0});
+if(DB.active>=DB.list.length||DB.active<0)DB.active=0;
+let P=DB.list[DB.active];
+let D=P.batons[P.activeBaton];
+const dayN=s=>Date.parse(s+"T00:00:00")/864e5;
+function calcD(){
+  $("d-name").value=P.name;$("d-bname").value=D.name;$("d-start").value=D.start;$("d-w0").value=D.w0;$("d-goal").value=D.goal;
+  if(!$("w-date").value)$("w-date").value=today();
+  const w0=parseFloat(D.w0),goal=parseFloat(D.goal)||35;
+  const log=[...D.log].sort((a,b)=>a.d.localeCompare(b.d));
+  const tb=$("w-tab").tBodies[0];tb.innerHTML="";
+  const pts=[];
+  if(w0>0)pts.push({x:0,w:w0});
+  log.forEach((e,i)=>{
+    const x=dayN(e.d)-dayN(D.start),prev=i?log[i-1]:null;
+    const loss=w0>0?(1-e.w/w0)*100:NaN;
+    let rate=NaN;
+    if(prev){const dd=dayN(e.d)-dayN(prev.d);if(dd>0&&w0>0)rate=(prev.w-e.w)/w0*100/dd}
+    else if(w0>0&&x>0)rate=loss/x;
+    pts.push({x,w:e.w,rate,loss});
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td>${e.d.split("-").reverse().join(".")}</td><td class="n">${fmt(e.w)}</td><td class="n">${fmt(loss,1)}</td><td class="n">${fmt(rate,2)}</td><td><button class="x" aria-label="Удалить запись">${IC("x")}</button></td>`;
+    tr.querySelector("button").onclick=()=>{D.log=D.log.filter(z=>z!==e);calcD()};
+    tb.appendChild(tr);
+  });
+  const tw=w0>0?w0*(1-goal/100):NaN;
+  $("d-target").textContent=fmt(tw);
+  const last=log[log.length-1];
+  let m="",loss=NaN;
+  if(!(w0>0))m=msg("","Введите вес закладки — от него считается потеря.");
+  else if(!last)m=msg("","Запишите первое взвешивание, чтобы увидеть динамику.");
+  else{
+    loss=(1-last.w/w0)*100;
+    const rem=goal-loss;
+    if(rem<=0)m+=msg("ok",`Цель достигнута: потеря ${fmt(loss,1)} %. Колбаса готова — проверьте на ощупь: упругая, без мягких мест.`);
+    else if(rem<=5)m+=msg("warn",`Почти готово: осталось ${fmt(rem,1)} % (около ${fmt(last.w-tw)} г). Взвешивайте чаще.`);
+    else m+=msg("","Идёт вяление: до цели "+fmt(rem,1)+" % веса.");
+    const rt=pts.filter(p=>p.rate===p.rate).slice(-1)[0];
+    if(rt&&loss<15&&rt.rate>1.5)m+=msg("bad",`Сохнет слишком быстро: ${fmt(rt.rate,2)} %/сут. Есть риск корки снаружи и сырой середины — поднимите влажность.`);
+    if(rt&&loss<20&&rt.rate<0.3&&log.length>2)m+=msg("warn",`Очень медленно: ${fmt(rt.rate,2)} %/сут. Проверьте тягу воздуха и влажность.`);
+    // прогноз по последним 3 точкам
+    const rp=pts.slice(-3);
+    if(rem>0&&rp.length>=2){
+      const dx=rp[rp.length-1].x-rp[0].x,dw=rp[0].w-rp[rp.length-1].w;
+      if(dx>0&&dw>0){const days=(last.w-tw)/(dw/dx);const dt=new Date(Date.parse(last.d+"T00:00:00")+days*864e5);
+        m+=msg("",`Прогноз по текущей скорости: ещё ~${fmt(days)} дн., около ${dt.toLocaleDateString("ru-RU")}. Потеря замедляется, так что реальный срок будет немного дальше.`);}
+    }
+  }
+  $("d-msgs").innerHTML=m;
+  $("d-loss").textContent=loss===loss?fmt(loss,1):"—";
+  const frac=loss===loss?Math.min(1,Math.max(0,loss/(goal*1.4))):0;
+  $("d-fill").style.width=(100-frac*40)+"%";
+  $("d-tick").style.left=`calc(22px + (100% - 44px) * ${(100-40/1.4)/100})`;
+  drawChart(pts,w0,goal,last,tw);
+  renderBatches();renderBatons();store.set("kolb.dry2",DB);
+}
+function drawChart(pts,w0,goal,last,tw){
+  const s=$("chart");
+  if(!(w0>0)||pts.length<2){s.innerHTML=`<text x="300" y="130" text-anchor="middle" style="font-size:27px">График появится после первого</text><text x="300" y="162" text-anchor="middle" style="font-size:27px">взвешивания</text>`;return}
+  const W=600,H=300,L=86,B=48,T=16,Rr=18;
+  const maxX=Math.max(...pts.map(p=>p.x),1)*1.15;
+  const minP=Math.min(100-goal-5,Math.min(...pts.map(p=>p.w/w0*100))),pStep=(100-minP)>28?10:5,lo=Math.floor(minP/pStep)*pStep,hi=100;
+  const X=x=>L+x/maxX*(W-L-Rr),Y=p=>T+(hi-p)/(hi-lo)*(H-T-B);
+  let g="";
+  for(let p=lo;p<=hi;p+=pStep)g+=`<line x1="${L}" x2="${W-Rr}" y1="${Y(p)}" y2="${Y(p)}" stroke="var(--line)"/><text x="${L-8}" y="${Y(p)+9}" text-anchor="end">${p}%</text>`;
+  const step=Math.max(1,Math.ceil(maxX/5));
+  for(let x=0;x<=maxX;x+=step)g+=`<text x="${X(x)}" y="${H-10}" text-anchor="middle">${Math.round(x)} д</text>`;
+  g+=`<line x1="${L}" x2="${W-Rr}" y1="${Y(100-goal)}" y2="${Y(100-goal)}" stroke="var(--green)" stroke-width="2" stroke-dasharray="6 4"/>`;
+  g+=`<polygon points="${X(pts[0].x)},${Y(lo)} ${pts.map(p=>X(p.x)+","+Y(p.w/w0*100)).join(" ")} ${X(pts[pts.length-1].x)},${Y(lo)}" fill="var(--red)" opacity=".13"/>`;
+  g+=`<polyline fill="none" stroke="var(--red)" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round" points="${pts.map(p=>X(p.x)+","+Y(p.w/w0*100)).join(" ")}"/>`;
+  g+=pts.map(p=>`<circle cx="${X(p.x)}" cy="${Y(p.w/w0*100)}" r="4" fill="var(--red)"/>`).join("");
+  s.innerHTML=g;
+}
+$("d-bname").oninput=e=>{D.name=e.target.value;store.set("kolb.dry2",DB);renderBatons()};
+$("d-name").oninput=e=>{P.name=e.target.value;store.set("kolb.dry2",DB);renderBatches()};
+$("d-start").onchange=e=>{D.start=e.target.value||today();calcD()};
+$("d-w0").oninput=e=>{D.w0=e.target.value;calcD()};
+$("d-goal").oninput=e=>{D.goal=e.target.value;calcD()};
+$("w-add").onclick=()=>{
+  const w=parseFloat($("w-val").value),d=$("w-date").value,hint=$("w-hint");
+  if(!(w>0)){hint.textContent="Введите вес в граммах.";hint.style.color="var(--bad)";return}
+  if(!d){hint.textContent="Выберите дату взвешивания.";hint.style.color="var(--bad)";return}
+  if(D.start&&d<D.start){hint.textContent="Дата взвешивания раньше даты закладки этого батона. Проверьте даты.";hint.style.color="var(--bad)";return}
+  const w0=parseFloat(D.w0);
+  hint.textContent=(w0>0&&w>w0*1.02)?"Вес больше начального — запись добавлена, но проверьте, не ошиблись ли вы.":"";
+  hint.style.color="var(--amber)";
+  D.log=D.log.filter(z=>z.d!==d);D.log.push({d,w});$("w-val").value="";calcD();
+};
+let delArm=null;
+$("d-reset").onclick=e=>{
+  const b=e.target;
+  if(!delArm){b.textContent="Нажмите ещё раз, чтобы удалить";delArm=setTimeout(()=>{delArm=null;b.textContent="Удалить эту партию"},3000);return}
+  clearTimeout(delArm);delArm=null;b.textContent="Удалить эту партию";
+  if(DB.list.length>1){DB.list.splice(DB.active,1);DB.active=Math.max(0,DB.active-1);P=DB.list[DB.active];D=P.batons[P.activeBaton]}
+  else{P.name="";P.batons=[newBaton()];P.activeBaton=0;D=P.batons[0]}
+  $("w-val").value="";calcD();
+};
+calcD();
+
+/* ---------- Готовые рецепты ---------- */
+const ART_SVG={
+doctor:`<ellipse cx="44" cy="40" rx="29" ry="25" fill="#b8704f"/><ellipse cx="44" cy="40" rx="26" ry="22" fill="#e6ad94"/><g fill="#f5d8c9"><circle cx="35" cy="33" r="2.4"/><circle cx="52" cy="47" r="2.2"/><circle cx="55" cy="31" r="1.8"/><circle cx="38" cy="49" r="2"/><circle cx="46" cy="40" r="1.6"/></g><ellipse cx="86" cy="28" rx="22" ry="19" fill="#b8704f" opacity=".85"/><ellipse cx="86" cy="28" rx="19.5" ry="16.5" fill="#dca089"/>`,
+milk:`<g stroke-linecap="round" fill="none"><path d="M16 20h54" stroke="#c98e6d" stroke-width="13"/><path d="M16 20h54" stroke="#e8b99c" stroke-width="9"/><path d="M26 38h66" stroke="#c98e6d" stroke-width="13"/><path d="M26 38h66" stroke="#e8b99c" stroke-width="9"/><path d="M16 56h54" stroke="#c98e6d" stroke-width="13"/><path d="M16 56h54" stroke="#e8b99c" stroke-width="9"/></g><g stroke="#f7e1d2" stroke-width="2" stroke-linecap="round" opacity=".7"><path d="M22 17h34M32 35h40M22 53h34"/></g>`,
+sardel:`<g stroke-linecap="round" fill="none"><path d="M20 24h74" stroke="#b9704f" stroke-width="24"/><path d="M20 24h74" stroke="#dd9b7d" stroke-width="20"/><path d="M20 52h74" stroke="#b9704f" stroke-width="24"/><path d="M20 52h74" stroke="#dd9b7d" stroke-width="20"/></g><path d="M101 24v28" stroke="#cfc6b6" stroke-width="3" stroke-linecap="round"/><path d="M28 18h40M28 46h40" stroke="#f3cdb7" stroke-width="3" stroke-linecap="round" opacity=".7"/>`,
+krakow:`<path d="M28 58V34a32 24 0 0 1 64 0v24" fill="none" stroke="#6e3321" stroke-width="18" stroke-linecap="round"/><path d="M28 58V34a32 24 0 0 1 64 0v24" fill="none" stroke="#9a5233" stroke-width="14" stroke-linecap="round"/><path d="M33 36a27 19 0 0 1 40-14" fill="none" stroke="#c88260" stroke-width="3" stroke-linecap="round" opacity=".7"/><path d="M22 62h12M86 62h12" stroke="#d9d0c0" stroke-width="2.4" stroke-linecap="round"/>`,
+hunter:`<g stroke-linecap="round" fill="none"><path d="M24 26h72" stroke="#4f2417" stroke-width="13"/><path d="M24 26h72" stroke="#7f402a" stroke-width="9"/><path d="M24 48h72" stroke="#4f2417" stroke-width="13"/><path d="M24 48h72" stroke="#7f402a" stroke-width="9"/><path d="M104 26c9 4 9 18 0 22" stroke="#cfc6b6" stroke-width="2.4"/></g><path d="M32 23h36M32 45h36" stroke="#b97a5c" stroke-width="2" stroke-linecap="round" opacity=".7"/>`,
+salami:`<circle cx="70" cy="34" r="22" fill="#c7c2b7"/><circle cx="70" cy="34" r="19.5" fill="#7d2724"/><circle cx="42" cy="40" r="27" fill="#cfcabf"/><circle cx="42" cy="40" r="24" fill="#8f2f2b"/><g fill="#f1e8da"><circle cx="34" cy="32" r="3"/><circle cx="50" cy="35" r="2.4"/><circle cx="40" cy="48" r="3"/><circle cx="53" cy="49" r="2"/><circle cx="31" cy="44" r="1.8"/><circle cx="45" cy="27" r="1.8"/></g>`,
+longaniza:`<g stroke-linecap="round" fill="none"><path d="M16 58L98 18" stroke="#d6d0c4" stroke-width="17"/><path d="M16 58L98 18" stroke="#a24b36" stroke-width="12"/><path d="M20 53L92 18" stroke="#c97a5c" stroke-width="2.4" opacity=".6"/></g><path d="M100 14c6-2 12 2 12 8" fill="none" stroke="#cfc6b6" stroke-width="2.4" stroke-linecap="round"/><g fill="#efe7d8"><circle cx="40" cy="43" r="1.6"/><circle cx="58" cy="36" r="1.6"/><circle cx="76" cy="27" r="1.6"/></g>`,
+chorizo:`<circle cx="70" cy="34" r="22" fill="#a53a22"/><circle cx="42" cy="40" r="27" fill="#d0502d"/><circle cx="42" cy="40" r="24" fill="#c9482a"/><g fill="#7a2415"><circle cx="34" cy="33" r="2.2"/><circle cx="50" cy="44" r="2.4"/><circle cx="41" cy="49" r="1.8"/><circle cx="52" cy="32" r="1.6"/><circle cx="31" cy="45" r="1.6"/></g><g fill="#efc77e"><circle cx="38" cy="40" r="2.8"/><circle cx="47" cy="38" r="2.2"/><circle cx="43" cy="30" r="1.8"/></g>`,
+bresaola:`<g transform="rotate(-8 60 40)"><ellipse cx="60" cy="44" rx="44" ry="20" fill="#5e1b26"/><ellipse cx="58" cy="38" rx="42" ry="19" fill="#8c2a37"/><ellipse cx="56" cy="33" rx="40" ry="17" fill="#a53645"/></g><g stroke="#d9a0a0" stroke-width="1.4" fill="none" opacity=".75" stroke-linecap="round"><path d="M28 34c10-6 20-6 30 0"/><path d="M50 40c10-5 20-5 32-1"/></g>`,
+balyk:`<rect x="12" y="18" width="96" height="38" rx="15" fill="#8d3b27"/><path d="M12 33a15 15 0 0 1 15-15h66a15 15 0 0 1 15 15z" fill="#f0e5d0"/><path d="M26 46h68" stroke="#b8604a" stroke-width="2" stroke-linecap="round" opacity=".7"/><path d="M30 38h54" stroke="#b8604a" stroke-width="2" stroke-linecap="round" opacity=".5"/>`,
+ham:`<rect x="12" y="20" width="78" height="38" rx="14" fill="#e0a58a"/><path d="M12 50a14 14 0 0 0 14 8h50a14 14 0 0 0 14-8z" fill="#cf8f74"/><ellipse cx="96" cy="46" rx="17" ry="14" fill="#c98166"/><ellipse cx="96" cy="46" rx="14.5" ry="11.5" fill="#efc2ab"/><path d="M26 34h44" stroke="#f3d3c1" stroke-width="2.5" stroke-linecap="round" opacity=".7"/>`,
+liver:`<rect x="12" y="20" width="80" height="38" rx="14" fill="#8a6652"/><path d="M12 48a14 14 0 0 0 14 10h52a14 14 0 0 0 14-10z" fill="#755441"/><ellipse cx="98" cy="46" rx="16" ry="13" fill="#6f4f3f"/><ellipse cx="98" cy="46" rx="13.5" ry="10.5" fill="#b69a82"/><path d="M26 34h46" stroke="#b49478" stroke-width="2.5" stroke-linecap="round" opacity=".7"/>`,
+oven:`<rect x="10" y="46" width="100" height="14" rx="7" fill="#4f565b"/><rect x="10" y="46" width="100" height="5" rx="2.5" fill="#6a7278"/><g stroke-linecap="round" fill="none"><path d="M26 40h60" stroke="#6e3321" stroke-width="14"/><path d="M26 40h60" stroke="#9a5233" stroke-width="10"/></g><g stroke="#a6a19a" stroke-width="2.4" fill="none" stroke-linecap="round" opacity=".7"><path d="M40 28c-4-5 4-6 0-11M58 28c-4-5 4-6 0-11M76 28c-4-5 4-6 0-11"/></g>`,
+semidry:`<g stroke-linecap="round" fill="none"><path d="M18 36h84" stroke="#4a2417" stroke-width="26"/><path d="M18 36h84" stroke="#7a3d28" stroke-width="22"/></g><path d="M30 28h50" stroke="#b97a5c" stroke-width="2.6" stroke-linecap="round" opacity=".7"/><g stroke="#cfc6b6" stroke-width="2"><path d="M48 25v22M70 25v22"/></g>`,
+smoked:`<g stroke-linecap="round" fill="none"><path d="M18 46h84" stroke="#3d1b11" stroke-width="22"/><path d="M18 46h84" stroke="#6b3220" stroke-width="18"/></g><g stroke="#a6a19a" stroke-width="2.6" fill="none" stroke-linecap="round" opacity=".75"><path d="M34 30c-5-6 5-8 0-14M56 30c-5-6 5-8 0-14M78 30c-5-6 5-8 0-14"/></g>`
+};
+const ART=k=>`<svg class="art" viewBox="0 0 120 72" aria-hidden="true" focusable="false">${ART_SVG[k]||ART_SVG.salami}</svg>`;
+const TYPEART={boiled:"doctor",semi:"krakow",dry:"salami",whole:"bresaola"};
+let lastName="";
+function chips(id,list,fn,noteId){
+  const box=$(id);
+  box.classList.remove("chips");
+  const groups=[];
+  list.forEach((p,i)=>{const gn=p.group||"";let g=groups.find(x=>x.n===gn);if(!g){g={n:gn,items:[]};groups.push(g)}g.items.push([p,i])});
+  box.innerHTML=groups.map(g=>`<div class="pgroup">${g.n?`<h3>${esc(g.n)}</h3>`:""}<div class="tiles">`+g.items.map(([p,i])=>`<button class="tile" data-i="${i}">${p.art?ART(p.art):""}<span>${esc(p.n)}</span></button>`).join("")+`</div></div>`).join("");
+  box.querySelectorAll("button").forEach(b=>b.onclick=()=>{
+    box.querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b));
+    const p=list[+b.dataset.i];lastName=p.n;fn(p);
+    if(noteId&&p.note)$(noteId).textContent=p.note;
+  });
+}
+const SPN={perec:"Перец чёрный молотый",chesn:"Чеснок свежий",pap:"Паприка сладкая",kor:"Кориандр",must:"Мускатный орех",kard:"Кардамон",sah:"Сахар / декстроза"};
+const R_PRE=[
+ {n:"Докторская",group:"Варёные",art:"doctor",type:"boiled",st:"cure",salt:2.0,sp:{perec:.5,must:.6,kard:.2,sah:2},note:"Нежирная свинина и говядина с льдом, тонкая эмульсия. Нужен куттер или блендер."},
+ {n:"Молочные сосиски",group:"Варёные",art:"milk",type:"boiled",st:"cure",salt:2.0,sp:{must:.5,kard:.2,perec:.4,sah:1.5},note:"Нежная эмульсия, оболочка 22–26 мм."},
+ {n:"Краковская",group:"Варёно-копчёные",art:"krakow",type:"semi",st:"cure",salt:2.4,sp:{perec:2.5,chesn:3,must:.3,sah:1.5},note:"Крупный рубленый фарш. Осадка, копчение, затем варка."},
+ {n:"Охотничьи",group:"Варёно-копчёные",art:"hunter",type:"semi",st:"cure",salt:2.5,sp:{perec:2.5,chesn:3,kor:1,pap:2,sah:1.5},note:"Пара колбасок в оболочке 22–26 мм: копчение и варка."},
+ {n:"Салями",group:"Сыровяленые",art:"salami",type:"dry",st:"mix",share:85,salt:2.8,sp:{perec:2,chesn:2,sah:3},note:"Мясо и шпик охлаждены до 0 °C, режем, не мажем. Нужна стартовая культура или проверенный засол."},
+ {n:"Лонганиза (как Casademont)",group:"Сыровяленые",art:"longaniza",type:"dry",st:"cure",salt:2.5,sp:{perec:3,sah:2.5},extra:[["Лактоза",5]],note:"Реконструкция по составу на этикетке, точные дозы производитель не публикует. Постная свинина около 85–90 %, остальное шпик, натуральная оболочка около 60 мм. Белая плесень наносится на поверхность. Сушка до 2 месяцев."},
+ {n:"Чоризо",group:"Сыровяленые",art:"chorizo",type:"dry",st:"mix",share:85,salt:2.8,sp:{pap:12,chesn:5,perec:1,sah:2.5},note:"Для настоящего вкуса возьмите копчёную паприку."},
+ {n:"Бресаола",group:"Цельномышечные",art:"bresaola",type:"whole",st:"mix",share:70,salt:3.5,sp:{perec:2,chesn:2,pap:2,sah:2},note:"Говяжья мякоть, сухой засол 7–10 дней, затем вяление."},
+ {n:"Балык свиной",group:"Цельномышечные",art:"balyk",type:"whole",st:"mix",share:70,salt:3.5,sp:{perec:2,kor:1.5,sah:2},note:"Цельный кусок, засол 5–7 дней, потом вяление."}
+];
+chips("r-pre",R_PRE,p=>{
+  R.type=p.type;R.st=p.st;R.salt=p.salt;R.share=p.share??50;R.sp=[];R.removed=[];
+  DEF_SP.forEach(d=>{const k=Object.keys(SPN).find(k=>SPN[k]===d[0]);if(p.sp[k]!=null)R.sp.push([d[0],p.sp[k]]);else R.removed.push([d[0],d[1]])});
+  (p.extra||[]).forEach(x=>R.sp.push([x[0],x[1]]));
+  renderSpices();calcR();
+},"r-pn");
+const C_PRE=[
+ {n:"Докторская 45 мм",group:"Батоны",art:"doctor",d:45,m:"1",tc:72,note:"Классическая варка в воде 78 °C."},
+ {n:"Молочные сосиски",group:"Сосиски и сардельки",art:"milk",d:24,m:"1",tc:72,note:"Тонкая оболочка: варка быстрая, проверяйте щупом через 15–20 мин."},
+ {n:"Сардельки",group:"Сосиски и сардельки",art:"sardel",d:32,m:"1",tc:72,note:"Не допускайте кипения, оболочка лопнет."},
+ {n:"Краковская (после копчения)",group:"Батоны",art:"krakow",d:40,m:"1",tc:72,note:"Варка после копчения при 78–80 °C."},
+ {n:"Печёночная",group:"Батоны",art:"liver",d:60,m:"1",tc:72,note:"Охладить в ледяной воде до 30 °C сразу после варки."},
+ {n:"Варёная ветчина в форме",group:"Ветчина и запекание",art:"ham",d:100,m:"1",tc:70,note:"Большая масса: щуп обязателен, вода 75–78 °C."},
+ {n:"Домашняя в духовке",group:"Ветчина и запекание",art:"oven",d:40,m:"1.25",tc:72,note:"Духовка 90 °C, противень с водой, щуп в центре."}
+];
+chips("c-pre",C_PRE,p=>{$("c-d").value=p.d;$("c-m").value=p.m;$("c-tc").value=p.tc;calcC()},"c-pn");
+const D_PRE=[
+ {n:"Полусухая",group:"Колбасы",art:"semidry",goal:22,note:"Обычно 7–14 дней. Подвялить при 12–15 °C, 75–80 %."},
+ {n:"Сырокопчёная",group:"Колбасы",art:"smoked",goal:32,note:"Обычно 3–5 недель. Сначала холодное копчение, затем сушка."},
+ {n:"Салями",group:"Колбасы",art:"salami",goal:35,note:"Обычно 3–6 недель. Первую неделю потеря до 1 % в сутки."},
+ {n:"Лонганиза (как Casademont)",group:"Колбасы",art:"longaniza",goal:35,note:"Созревание до 2 месяцев. Сначала 2–3 суток при 20 °C и влажности 90–85 %, затем 12–15 °C и 80–85 %. Белая плесень на оболочке — норма. Колбаса деформируется, это нормально."},
+ {n:"Чоризо",group:"Колбасы",art:"chorizo",goal:33,note:"Обычно 3–5 недель, оболочка 40–50 мм."},
+ {n:"Бресаола",group:"Цельномышечные",art:"bresaola",goal:32,note:"Обычно 4–8 недель. Сушить в сетке или обвязке."},
+ {n:"Балык",group:"Цельномышечные",art:"balyk",goal:30,note:"Обычно 3–5 недель. Куски сушить без касания друг друга."}
+];
+chips("d-pre",D_PRE,p=>{D.goal=p.goal;calcD()},"d-pn");
+
+/* ---------- Избранное и книга проверенных ---------- */
+const TN={boiled:"варёная",semi:"варёно-копчёная",dry:"сыровяленая",whole:"цельномышечная"};
+let B=store.get("kolb.book",{fav:[],book:[]});
+const saveB=()=>store.set("kolb.book",B);
+function esc(t){return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+const ddmm=d=>d.split("-").reverse().join(".");
+function snap(name){
+  return {id:Date.now()+Math.random().toString(36).slice(2,6),name:name||(TN[R.type]+" "+ddmm(today())),date:today(),notes:"",
+    r:JSON.parse(JSON.stringify(R)),c:{d:$("c-d").value,m:$("c-m").value,t0:$("c-t0").value,tc:$("c-tc").value},goal:D.goal};
+}
+function summary(s){
+  const st=s.r.st==="cure"?"нитритная":s.r.st==="mix"?"смесь":"обычная";
+  return `${TN[s.r.type]}, соль ${fmt(s.r.salt,1)} % (${st}); варка ${s.c.d} мм до ${s.c.tc} °C; вяление до −${s.goal} %`;
+}
+function applySnap(s){
+  R=JSON.parse(JSON.stringify(s.r));if(!R.removed)R.removed=[];if(R.share==null)R.share=50;
+  $("c-d").value=s.c.d;$("c-m").value=s.c.m;$("c-t0").value=s.c.t0;$("c-tc").value=s.c.tc;
+  D.goal=s.goal;lastName=s.name;
+  renderSpices();calcR();calcC();calcD();
+  document.querySelector('nav button[data-t="r"]').click();
+  window.scrollTo(0,0);
+}
+function renderBook(){
+  const mk=(list,kind)=>list.length?list.map((s,i)=>`<div class="item" data-k="${kind}" data-i="${i}">
+    <div class="ihead"><span class="thumb">${ART(TYPEART[s.r.type]||"salami")}</span><input class="nm" value="${esc(s.name)}" aria-label="Название"></div>
+    <div class="note">${summary(s)}<br>Специи, г/кг: ${s.r.sp.map(x=>esc(x[0])+" "+x[1]).join(", ")||"—"}<br>Сохранено ${ddmm(s.date)}</div>
+    ${kind==="book"?`<textarea class="nt" rows="2" aria-label="Заметки" placeholder="Что получилось, что поправить в следующий раз">${esc(s.notes)}</textarea>`:""}
+    <div class="chips" style="margin-top:8px"><button class="chip" data-a="apply">Открыть в расчёте</button>${kind==="fav"?`<button class="chip" data-a="tobook">В книгу проверенных</button>`:`<button class="chip" data-a="tofav">Вернуть в избранное</button>`}<button class="chip" data-a="del">Удалить</button></div></div>`).join(""):`<p class="note">${kind==="fav"?"Пока пусто. Нажмите ★ на любой вкладке.":"Пока пусто. Перенесите сюда рецепты, которые вы уже приготовили."}</p>`;
+  $("b-fav").innerHTML=mk(B.fav,"fav");$("b-book").innerHTML=mk(B.book,"book");
+}
+["b-fav","b-book"].forEach(id=>{
+  const box=$(id);
+  box.addEventListener("click",e=>{
+    const btn=e.target.closest("button[data-a]"),it=e.target.closest(".item");if(!btn||!it)return;
+    const k=it.dataset.k,i=+it.dataset.i,from=B[k],s=from[i],a=btn.dataset.a;
+    if(a==="apply")return applySnap(s);
+    if(a==="del")from.splice(i,1);
+    if(a==="tobook"){from.splice(i,1);B.book.unshift(s)}
+    if(a==="tofav"){from.splice(i,1);B.fav.unshift(s)}
+    saveB();renderBook();
+  });
+  box.addEventListener("input",e=>{
+    const it=e.target.closest(".item");if(!it)return;
+    const s=B[it.dataset.k][+it.dataset.i];
+    if(e.target.classList.contains("nm"))s.name=e.target.value;
+    if(e.target.classList.contains("nt"))s.notes=e.target.value;
+    saveB();
+  });
+});
+$("b-save").onclick=()=>{
+  B.fav.unshift(snap($("b-name").value.trim()||lastName));$("b-name").value="";saveB();renderBook();
+  $("b-msg").textContent="Сохранено в избранное.";
+};
+["r-pn","c-pn","d-pn"].forEach(id=>{
+  $(id).insertAdjacentHTML("afterend",`<div class="row" style="margin:12px 0 0;align-items:center;flex-wrap:wrap"><div style="flex:1 1 100%"><input class="pn" aria-label="Название рецепта" placeholder="Название вашего рецепта"></div><button class="btn ghost small" data-save style="flex:0 0 auto">${IC("star")} В избранное</button><button class="btn ghost small" data-add style="flex:0 0 auto">${IC("plus")} В готовые рецепты</button><span class="note savemsg" style="flex:1 1 100%" aria-live="polite"></span></div>`);
+});
+document.querySelectorAll("[data-save]").forEach(b=>b.onclick=()=>{
+  B.fav.unshift(snap(pnVal()||lastName));clearPn();saveB();renderBook();
+  document.querySelectorAll(".savemsg").forEach(x=>x.textContent="");
+  b.parentNode.querySelector(".savemsg").textContent="Сохранено. Смотрите вкладку «Книга».";
+});
+renderBook();
+
+/* свои рецепты и скрытие списков */
+if(!B.user)B.user=[];
+const UI=store.get("kolb.ui",{hide:{}});
+if(!UI.hide)UI.hide={};
+function pnVal(){const e=document.querySelector(".pn");return e?e.value.trim():""}
+function clearPn(){document.querySelectorAll(".pn").forEach(e=>e.value="")}
+document.querySelectorAll(".pn").forEach(e=>e.oninput=()=>document.querySelectorAll(".pn").forEach(x=>{if(x!==e)x.value=e.value}));
+function userApply(t,s){
+  if(t==="r"){R=JSON.parse(JSON.stringify(s.r));if(!R.removed)R.removed=[];if(R.share==null)R.share=50;renderSpices();calcR()}
+  if(t==="c"){$("c-d").value=s.c.d;$("c-m").value=s.c.m;$("c-t0").value=s.c.t0;$("c-tc").value=s.c.tc;calcC()}
+  if(t==="d"){D.goal=s.goal;calcD()}
+  lastName=s.name;
+  $(t+"-pn").textContent="Свой рецепт, сохранён "+ddmm(s.date)+".";
+}
+function renderUser(){
+  ["r","c","d"].forEach(t=>{
+    const box=$(t+"-user");
+    box.innerHTML=B.user.map((s,i)=>`<div class="tile uc" data-i="${i}"><button class="uuse" data-a="use">${ART(TYPEART[s.r.type]||"salami")}<span>${esc(s.name)}</span></button><button class="x urm" data-a="rm" aria-label="Удалить рецепт ${esc(s.name)}">${IC("x")}</button></div>`).join("");
+    box.previousElementSibling.hidden=!B.user.length;
+  });
+}
+["r","c","d"].forEach(t=>{
+  const pre=$(t+"-pre"),pn=$(t+"-pn"),h=pre.previousElementSibling;
+  const box=document.createElement("div");box.id=t+"-box";
+  h.after(box);
+  box.append(pre,pn);
+  box.insertAdjacentHTML("beforeend",`<h3 class="uh">Мои рецепты</h3><div class="tiles" id="${t}-user"></div>`);
+  h.style.cssText="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:0";
+  h.innerHTML=`<span>${h.textContent}</span><button class="btn ghost small" style="font-weight:500"></button>`;
+  const tg=h.querySelector("button");
+  const set=()=>{const hid=!!UI.hide[t];box.hidden=hid;tg.textContent=hid?"Показать":"Скрыть";tg.setAttribute("aria-expanded",String(!hid));store.set("kolb.ui",UI)};
+  tg.onclick=()=>{UI.hide[t]=!UI.hide[t];set()};
+  set();
+  box.addEventListener("click",e=>{
+    const b=e.target.closest("[data-a]"),c=e.target.closest(".uc");
+    if(!c){if(e.target.closest(".chip,.tile"))box.querySelectorAll(".uc").forEach(x=>x.classList.remove("on"));return}
+    if(!b)return;
+    const i=+c.dataset.i;
+    if(b.dataset.a==="rm"){B.user.splice(i,1);saveB();renderUser()}
+    else{box.querySelectorAll(".chip,.tile").forEach(x=>x.classList.toggle("on",x===c));userApply(t,B.user[i])}
+  });
+});
+document.querySelectorAll("[data-add]").forEach(b=>b.onclick=()=>{
+  B.user.push(snap(pnVal()||lastName));saveB();renderUser();clearPn();
+  document.querySelectorAll(".savemsg").forEach(x=>x.textContent="");
+  b.parentNode.querySelector(".savemsg").textContent="Добавлено в «Мои рецепты» на всех трёх вкладках.";
+});
+$("b-add").onclick=()=>{B.user.push(snap($("b-name").value.trim()||lastName));$("b-name").value="";saveB();renderUser();$("b-msg").textContent="Добавлено в готовые рецепты."};
+function renderBatches(){
+  const box=$("d-batches");
+  box.innerHTML=DB.list.map((b,i)=>`<button class="chip${i===DB.active?" on":""}" data-i="${i}">${esc(b.name||("Партия "+(i+1)))}</button>`).join("")+`<button class="chip" data-new>${IC("plus")} Новая партия</button>`;
+}
+$("d-batches").addEventListener("click",e=>{
+  const b=e.target.closest("button");if(!b)return;
+  if(b.hasAttribute("data-new")){DB.list.push(newPartition(""));DB.active=DB.list.length-1;P=DB.list[DB.active];D=P.batons[P.activeBaton];$("w-val").value="";calcD()}
+  else selectPartition(+b.dataset.i);
+});
+/* ---------- Батоны внутри партии ---------- */
+function selectPartition(i){DB.active=i;P=DB.list[i];D=P.batons[P.activeBaton];$("w-val").value="";$("w-hint").textContent="";calcD()}
+function selectBaton(j){P.activeBaton=j;D=P.batons[j];$("w-val").value="";$("w-hint").textContent="";calcD()}
+function renderBatons(){
+  $("d-bat").innerHTML=P.batons.map((b,i)=>`<button class="chip${i===P.activeBaton?" on":""}" data-j="${i}">${esc(b.name||("Батон "+(i+1)))}</button>`).join("");
+  $("d-bdel").hidden=P.batons.length<2;
+}
+$("d-bat").addEventListener("click",e=>{const b=e.target.closest("button");if(b)selectBaton(+b.dataset.j)});
+$("d-bnew").onclick=()=>{
+  const f=$("d-bform");f.hidden=!f.hidden;
+  if(!f.hidden){$("bf-name").value="Батон "+(P.batons.length+1);$("bf-start").value=today();$("bf-w0").value="";$("bf-w0").style.borderColor="";$("bf-goal").value="35";$("bf-w0").focus()}
+};
+$("bf-cancel").onclick=()=>{$("d-bform").hidden=true};
+$("bf-ok").onclick=()=>{
+  const w0=parseFloat($("bf-w0").value);
+  if(!(w0>0)){$("bf-w0").style.borderColor="var(--bad)";$("bf-w0").focus();return}
+  const nb=newBaton({name:$("bf-name").value.trim()||("Батон "+(P.batons.length+1)),start:$("bf-start").value||today(),w0:w0,goal:parseFloat($("bf-goal").value)||35});
+  P.batons.push(nb);P.activeBaton=P.batons.length-1;D=nb;
+  $("d-bform").hidden=true;$("w-val").value="";calcD();
+};
+let batArm=null;
+$("d-bdel").onclick=e=>{
+  const b=e.target;if(P.batons.length<2)return;
+  if(!batArm){b.textContent="Нажмите ещё раз, чтобы удалить";batArm=setTimeout(()=>{batArm=null;b.textContent="Удалить батон"},3000);return}
+  clearTimeout(batArm);batArm=null;b.textContent="Удалить батон";
+  P.batons.splice(P.activeBaton,1);P.activeBaton=Math.min(P.activeBaton,P.batons.length-1);D=P.batons[P.activeBaton];
+  $("w-val").value="";calcD();
+};
+renderBatches();
+renderUser();
+
+function cardify(){
+  document.querySelectorAll("section").forEach(sec=>{
+    if(sec.dataset.cardified)return;sec.dataset.cardified="1";
+    let card=null;
+    [...sec.children].forEach(k=>{
+      if(k.classList.contains("bwrap")){card=null;return}
+      if(k.tagName==="H2"||!card){card=document.createElement("div");card.className="card";sec.insertBefore(card,k)}
+      card.appendChild(k);
+    });
+  });
+}
+cardify();
+if(inTg){
+  if(cloud)$("b-msg").textContent="Данные хранятся в облаке Telegram и доступны на всех ваших устройствах.";
+  try{tg.ready()}catch(e){}
+}
+}
+cloudLoad(boot);
+</script>
+</body>
+</html>
